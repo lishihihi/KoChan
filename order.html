@@ -65,7 +65,7 @@ function submitOrder() {
     return;
   }
 
-  fetch("PASTE_SCRIPT_URL_HERE", {
+  fetch("https://script.google.com/macros/s/AKfycbz9b0xJmGxmGgbsUJesDcYqHy_ecInb_vwdj1eEyl06E058kzQVP1S_UXgYT7F89sXr3g/exec", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data)
@@ -78,3 +78,4 @@ function submitOrder() {
 
 </body>
 </html>
+
