@@ -1,81 +1,182 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Đặt món</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kochan – Đặt món</title>
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 12px;
-      background: #f7f7f7;
-    }
-    img {
-      width: 100%;
-      border-radius: 8px;
-      margin-bottom: 10px;
-    }
-    input, button {
-      width: 100%;
-      padding: 12px;
-      margin: 6px 0;
-      font-size: 16px;
-    }
-    button {
-      background: #28a745;
-      color: white;
-      border: none;
-      border-radius: 6px;
-    }
-  </style>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Roboto, Arial;
+  background: #f4f4f4;
+}
+.container {
+  max-width: 480px;
+  margin: auto;
+  background: #fff;
+  padding: 12px;
+}
+h2 {
+  margin: 16px 0 8px;
+  font-size: 18px;
+  border-left: 4px solid #e53935;
+  padding-left: 8px;
+}
+.menu-img {
+  width: 100%;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+.field input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 10px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+.item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px dashed #ddd;
+}
+.item-name {
+  font-size: 15px;
+}
+.item-price {
+  color: #e53935;
+  font-weight: bold;
+  font-size: 14px;
+}
+.qty {
+  display: flex;
+  align-items: center;
+}
+.qty button {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: #eee;
+  font-size: 18px;
+}
+.qty span {
+  width: 32px;
+  text-align: center;
+  font-size: 16px;
+}
+.total {
+  font-size: 18px;
+  font-weight: bold;
+  text-align: right;
+  margin-top: 12px;
+}
+button.submit {
+  width: 100%;
+  padding: 14px;
+  font-size: 18px;
+  background: #e53935;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  margin-top: 12px;
+}
+</style>
 </head>
 
 <body>
+<div class="container">
 
-  <!-- MENU -->
-  <img src="menu1.jpg">
-  <img src="menu2.jpg">
+<img src="menu1.jpg" class="menu-img">
+<img src="menu2.jpg" class="menu-img">
 
-  <h3>Thông tin khách</h3>
+<h2>Thông tin khách</h2>
+<div class="field">
   <input id="name" placeholder="Tên người đặt">
-  <input id="phone" placeholder="Số điện thoại">
+  <input id="phone" placeholder="Số điện thoại" inputmode="numeric">
+</div>
 
-  <h3>Chọn món</h3>
-  <input id="bunbo" type="number" min="0" placeholder="Bún bò">
-  <input id="trasua" type="number" min="0" placeholder="Trà sữa">
-  <input id="flan" type="number" min="0" placeholder="Bánh flan">
+<h2>Combo / Gà</h2>
+<div id="items"></div>
 
-  <button onclick="submitOrder()">Đặt món</button>
+<div class="total">Tổng: <span id="total">0</span>k</div>
+
+<button class="submit" onclick="submitOrder()">ĐẶT MÓN</button>
+
+</div>
 
 <script>
+const menu = [
+  { name: "Gà nguyên con", price: 99 },
+  { name: "Nửa con gà", price: 60 },
+  { name: "Gà viên chiên giòn", price: 25 },
+  { name: "Gà viên phủ sốt", price: 30 },
+  { name: "Đùi gà chiên giòn", price: 25 },
+  { name: "Đùi gà phủ sốt", price: 30 },
+  { name: "Gà nửa con phủ sốt", price: 70 },
+  { name: "Kimbap thường", price: 30 },
+  { name: "Kimbap chiên", price: 35 },
+  { name: "Mỳ ý xúc xích", price: 25 },
+  { name: "Khoai tây chiên", price: 25 },
+  { name: "Khoai tây lắc phô mai", price: 30 },
+  { name: "Coca", price: 10 },
+  { name: "Trà quất", price: 10 }
+];
+
+const itemsDiv = document.getElementById("items");
+const quantities = {};
+
+menu.forEach((m, i) => {
+  quantities[i] = 0;
+  itemsDiv.innerHTML += `
+    <div class="item">
+      <div>
+        <div class="item-name">${m.name}</div>
+        <div class="item-price">${m.price}k</div>
+      </div>
+      <div class="qty">
+        <button onclick="changeQty(${i},-1)">−</button>
+        <span id="q${i}">0</span>
+        <button onclick="changeQty(${i},1)">+</button>
+      </div>
+    </div>
+  `;
+});
+
+function changeQty(i, d) {
+  quantities[i] = Math.max(0, quantities[i] + d);
+  document.getElementById("q"+i).innerText = quantities[i];
+  calcTotal();
+}
+
+function calcTotal() {
+  let total = 0;
+  menu.forEach((m,i)=> total += m.price * quantities[i]);
+  document.getElementById("total").innerText = total;
+}
+
 function submitOrder() {
-  const data = {
-    name: document.getElementById("name").value.trim(),
-    phone: document.getElementById("phone").value.trim(),
-    items: [
-      { name: "Bún bò", qty: Number(document.getElementById("bunbo").value) || 0 },
-      { name: "Trà sữa", qty: Number(document.getElementById("trasua").value) || 0 },
-      { name: "Bánh flan", qty: Number(document.getElementById("flan").value) || 0 }
-    ]
-  };
+  const name = document.getElementById("name").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  if (!name || !phone) return alert("Nhập tên và SĐT");
 
-  if (!data.name || !data.phone) {
-    alert("Vui lòng nhập tên và số điện thoại");
-    return;
-  }
+  const items = menu
+    .map((m,i)=>({name:m.name, qty:quantities[i]}))
+    .filter(i=>i.qty>0);
 
-  fetch("https://script.google.com/macros/s/AKfycbz9b0xJmGxmGgbsUJesDcYqHy_ecInb_vwdj1eEyl06E058kzQVP1S_UXgYT7F89sXr3g/exec", {
+  if (!items.length) return alert("Chưa chọn món");
+
+  fetch("SCRIPT_URL", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
+    body: JSON.stringify({ name, phone, items })
   })
-  .then(res => res.text())
-  .then(() => alert("Đặt món thành công"))
-  .catch(err => alert("Lỗi: " + err));
+  .then(()=>alert("Đặt món thành công"))
+  .catch(()=>alert("Lỗi gửi đơn"));
 }
 </script>
 
 </body>
 </html>
-
