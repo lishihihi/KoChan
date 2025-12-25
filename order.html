@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Đặt món</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 12px;
+      background: #f7f7f7;
+    }
+    img {
+      width: 100%;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin: 6px 0;
+      font-size: 16px;
+    }
+    button {
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- MENU -->
+  <img src="menu1.jpg">
+  <img src="menu2.jpg">
+
+  <h3>Thông tin khách</h3>
+  <input id="name" placeholder="Tên người đặt">
+  <input id="phone" placeholder="Số điện thoại">
+
+  <h3>Chọn món</h3>
+  <input id="bunbo" type="number" min="0" placeholder="Bún bò">
+  <input id="trasua" type="number" min="0" placeholder="Trà sữa">
+  <input id="flan" type="number" min="0" placeholder="Bánh flan">
+
+  <button onclick="submitOrder()">Đặt món</button>
+
+<script>
+function submitOrder() {
+  const data = {
+    name: document.getElementById("name").value.trim(),
+    phone: document.getElementById("phone").value.trim(),
+    items: [
+      { name: "Bún bò", qty: Number(document.getElementById("bunbo").value) || 0 },
+      { name: "Trà sữa", qty: Number(document.getElementById("trasua").value) || 0 },
+      { name: "Bánh flan", qty: Number(document.getElementById("flan").value) || 0 }
+    ]
+  };
+
+  if (!data.name || !data.phone) {
+    alert("Vui lòng nhập tên và số điện thoại");
+    return;
+  }
+
+  fetch("PASTE_SCRIPT_URL_HERE", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  })
+  .then(res => res.text())
+  .then(() => alert("Đặt món thành công"))
+  .catch(err => alert("Lỗi: " + err));
+}
+</script>
+
+</body>
+</html>
