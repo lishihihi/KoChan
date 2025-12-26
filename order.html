@@ -97,10 +97,17 @@ button.submit {
 <div class="field">
   <input id="name" placeholder="Tên người đặt">
   <input id="phone" placeholder="Số điện thoại" inputmode="numeric">
+  <input id="address" placeholder="Địa chỉ giao hàng">
 </div>
 
-<h2>Combo / Gà</h2>
+<h2>Combo</h2>
 <div id="items"></div>
+
+<h2>Gà rán</h2>
+<div id="fried-chicken"></div>
+
+<h2>Cơm & Mỳ</h2>
+<div id="rice-pasta"></div>
 
 <div class="total">Tổng: <span id="total">0</span>k</div>
 
@@ -109,74 +116,145 @@ button.submit {
 </div>
 
 <script>
-const menu = [
-  { name: "Gà nguyên con", price: 99 },
-  { name: "Nửa con gà", price: 60 },
-  { name: "Gà viên chiên giòn", price: 25 },
-  { name: "Gà viên phủ sốt", price: 30 },
-  { name: "Đùi gà chiên giòn", price: 25 },
-  { name: "Đùi gà phủ sốt", price: 30 },
-  { name: "Gà nửa con phủ sốt", price: 70 },
-  { name: "Kimbap thường", price: 30 },
-  { name: "Kimbap chiên", price: 35 },
-  { name: "Mỳ ý xúc xích", price: 25 },
-  { name: "Khoai tây chiên", price: 25 },
-  { name: "Khoai tây lắc phô mai", price: 30 },
-  { name: "Coca", price: 10 },
-  { name: "Trà quất", price: 10 }
+// Menu Combo
+const comboMenu = [
+  { name: "Gà viên 2 loại sốt, kimpab, khoai tây", price: 49 },
+  { name: "Gà viên sốt, mì ý, khoai tây chiên", price: 50 },
+  { name: "Gà viên 3 loại sốt, 1 kimpab", price: 100 },
+  { name: "Gà viên 2 loại sốt, 1 kimpab, khoai tây chiên", price: 115 },
+  { name: "4 miếng gà, 1 kimpab, khoai tây chiên, salad", price: 99 },
+  { name: "Gà nguyên con, 1 kimpab, khoai tây chiên, salad", price: 129 },
+  { name: "4 miếng gà, 2 xúc xích, 1 kimpab thường, 1 kimpab chiên, khoai tây chiên, salad", price: 139 }
 ];
 
+// Menu Gà rán
+const friedChickenMenu = [
+  { name: "Gà nguyên con", price: 99 },
+  { name: "Nửa con gà (đùi, ức, cánh)", price: 60 },
+  { name: "Gà viên chiên giòn", price: 25 },
+  { name: "Gà viên phủ sốt cay", price: 30 },
+  { name: "Gà viên phủ sốt kem", price: 30 },
+  { name: "Gà viên phủ sốt phô mai", price: 30 },
+  { name: "Đùi gà, khoai tây chiên", price: 30 },
+  { name: "Đùi gà chiên giòn", price: 25 },
+  { name: "Đùi gà phủ sốt cay", price: 30 },
+  { name: "Đùi gà phủ sốt kem", price: 30 },
+  { name: "Đùi gà phủ sốt phô mai", price: 30 },
+  { name: "Gà nửa con phủ sốt cay", price: 70 },
+  { name: "Gà nửa con phủ sốt kem", price: 70 },
+  { name: "Gà nửa con phủ sốt phô mai", price: 70 }
+];
+
+// Menu Cơm & Mỳ
+const ricePastaMenu = [
+  { name: "Kimpab thường", price: 30 },
+  { name: "Kimpab chiên", price: 35 },
+  { name: "Mỳ ý xúc xích", price: 25 },
+  { name: "Khoai tây chiên", price: 25 },
+  { name: "Khoai tây lắc phô mai", price: 30 }
+];
+
+const allMenus = [...comboMenu, ...friedChickenMenu, ...ricePastaMenu];
 const itemsDiv = document.getElementById("items");
+const friedDiv = document.getElementById("fried-chicken");
+const riceDiv = document.getElementById("rice-pasta");
+
+// Lưu số lượng + menuItem
 const quantities = {};
 
-menu.forEach((m, i) => {
-  quantities[i] = 0;
-  itemsDiv.innerHTML += `
-    <div class="item">
-      <div>
-        <div class="item-name">${m.name}</div>
-        <div class="item-price">${m.price}k</div>
+// Render menu
+function renderMenu(menuArray, container) {
+  menuArray.forEach((m,i)=>{
+    const id = container.id + "-" + i;
+    quantities[id] = { qty: 0, menuItem: m };
+    container.innerHTML += `
+      <div class="item" id="${id}">
+        <div>
+          <div class="item-name">${m.name}</div>
+          <div class="item-price">${m.price}k</div>
+        </div>
+        <div class="qty">
+          <button onclick="changeQty('${id}',-1)">−</button>
+          <span id="q${id}">0</span>
+          <button onclick="changeQty('${id}',1)">+</button>
+        </div>
       </div>
-      <div class="qty">
-        <button onclick="changeQty(${i},-1)">−</button>
-        <span id="q${i}">0</span>
-        <button onclick="changeQty(${i},1)">+</button>
-      </div>
-    </div>
-  `;
-});
+    `;
+  });
+}
 
-function changeQty(i, d) {
-  quantities[i] = Math.max(0, quantities[i] + d);
-  document.getElementById("q"+i).innerText = quantities[i];
+renderMenu(comboMenu, itemsDiv);
+renderMenu(friedChickenMenu, friedDiv);
+renderMenu(ricePastaMenu, riceDiv);
+
+// Thay đổi số lượng với kiểm tra phòng thủ
+function changeQty(id, d) {
+  const next = quantities[id].qty + d;
+  if (!Number.isInteger(next) || next < 0 || next > 99) return; // Giới hạn 0→99
+  quantities[id].qty = next;
+  document.getElementById("q"+id).innerText = next;
   calcTotal();
 }
 
-function calcTotal() {
-  let total = 0;
-  menu.forEach((m,i)=> total += m.price * quantities[i]);
-  document.getElementById("total").innerText = total;
+// Format số có dấu phẩy
+function formatNumber(num) {
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g,",");
 }
 
+// Tính tổng tiền
+function calcTotal() {
+  let total = 0;
+  Object.values(quantities).forEach(q=>total += q.qty*q.menuItem.price);
+  document.getElementById("total").innerText = formatNumber(total);
+}
+
+// Kiểm tra tên hợp lệ
+function isValidName(name) { return /^[a-zA-ZÀ-ỹ\s]+$/.test(name); }
+// Kiểm tra số điện thoại
+function isValidPhone(phone) { return /^[0-9]+$/.test(phone); }
+
+// Gửi đơn với kiểm tra số lượng phòng thủ
 function submitOrder() {
   const name = document.getElementById("name").value.trim();
   const phone = document.getElementById("phone").value.trim();
-  if (!name || !phone) return alert("Nhập tên và SĐT");
+  const address = document.getElementById("address").value.trim();
 
-  const items = menu
-    .map((m,i)=>({name:m.name, qty:quantities[i]}))
-    .filter(i=>i.qty>0);
+  if (!name || !phone || !address) return alert("Nhập tên, SĐT và địa chỉ");
+  if (!isValidName(name)) return alert("Tên không được chứa số hoặc ký tự đặc biệt");
+  if (!isValidPhone(phone)) return alert("Số điện thoại chỉ được chứa số");
+
+  const items = [];
+  for (let k of Object.keys(quantities)) {
+    const q = quantities[k].qty;
+    if (!Number.isInteger(q) || q < 0 || q > 99) {
+      alert("Số lượng món không hợp lệ");
+      throw new Error("Invalid quantity");
+    }
+    if (q > 0) {
+      items.push({ name: quantities[k].menuItem.name, qty: q, price: quantities[k].menuItem.price });
+    }
+  }
 
   if (!items.length) return alert("Chưa chọn món");
 
-  fetch("SCRIPT_URL", {
+  const total = Object.values(quantities).reduce((sum,q)=>sum+q.qty*q.menuItem.price,0);
+
+  const orderData = { name, phone, address, items, total };
+
+  fetch("https://script.google.com/macros/s/ABCDE12345/exec", {
     method: "POST",
-    body: JSON.stringify({ name, phone, items })
+    body: JSON.stringify(orderData),
+    headers: {"Content-Type": "text/plain;charset=utf-8"}
   })
-  .then(()=>alert("Đặt món thành công"))
-  .catch(()=>alert("Lỗi gửi đơn"));
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === "success") alert("Đặt món thành công!");
+    else alert("Lỗi: " + data.message);
+  })
+  .catch(err => alert("Lỗi gửi đơn: " + err));
 }
 </script>
 
 </body>
 </html>
+>
